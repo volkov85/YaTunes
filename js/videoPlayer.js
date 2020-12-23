@@ -5,6 +5,15 @@ export const videoPlayerInit = () => {
     const videoTimePassed = document.querySelector('.video-time__passed');
     const videoProgress = document.querySelector('.video-progress');
     const videoTimeTotal = document.querySelector('.video-time__total');
+    const videoVolume = document.querySelector('.video-volume');
+    const videoVolumeOff = document.querySelector('.video-volume-off');
+    const videoVolumeDown = document.querySelector('.video-volume-down');
+    const videoVolumeUp = document.querySelector('.video-volume-up');
+    const videoFullscreen = document.querySelector('.video-fullscreen');
+
+    videoFullscreen.addEventListener('click', () => {
+        videoPlayer.requestFullscreen();
+    });
 
     /**
      * Переключение иконочного шрифта на кнопке играть/пауза
@@ -22,7 +31,8 @@ export const videoPlayerInit = () => {
     /**
      * Воспроизведение/остановка видео
      */    
-    const togglePlay = () => {
+    const togglePlay = (event) => {
+        event.preventDefault();
         if (videoPlayer.paused) {
             videoPlayer.play();
         } else {
@@ -44,6 +54,15 @@ export const videoPlayerInit = () => {
      */
     const addZero = n => n < 10 ? '0' + n : n;
 
+    /**
+     * Функция изменения громкости проигрывания
+     */
+    const changeValue = () => {
+        const valueVolume = videoVolume.value;
+
+        videoPlayer.volume = valueVolume / 100;
+    }
+
     videoPlayer.addEventListener('click', togglePlay);
     videoButtonPlay.addEventListener('click', togglePlay);
 
@@ -63,7 +82,6 @@ export const videoPlayerInit = () => {
 
         let minutePassed = Math.floor(currentTime / 60);
         let secondsPassed = Math.floor(currentTime % 60);
-        console.log(typeof(minutePassed));
 
         let minuteTotal = Math.floor(duration / 60);
         let secondsTotal = Math.floor(duration % 60);
@@ -75,10 +93,44 @@ export const videoPlayerInit = () => {
     /**
      * Перемотка ролика через изменение положения бегунка
      */  
-    videoProgress.addEventListener('change', () => {
+    videoProgress.addEventListener('input', () => {
         const duration = videoPlayer.duration;
         const value = videoProgress.value;
 
         videoPlayer.currentTime = (value * duration) / 100;
     });
+
+    /**
+     * Отключение звука и возврат в обратное положение
+     */  
+    videoVolumeOff.addEventListener('click', () => {
+        const valueVolume = videoVolume.value;
+
+        if (videoPlayer.volume != 0) {
+            videoPlayer.volume = 0;
+        } else {
+            videoPlayer.volume = valueVolume / 100;
+        }
+    });
+
+    videoVolumeDown.addEventListener('click', () => {
+        videoPlayer.volume = 0;
+        videoVolume.value = 0;
+    });
+
+    videoVolumeUp.addEventListener('click', () => {
+        videoPlayer.volume = 1;
+        videoVolume.value = 100;
+    });
+
+    /**
+     * Изменение громкости через изменение положения бегунка
+     */  
+    videoVolume.addEventListener('input', changeValue);
+
+    // videoPlayer.addEventListener('volumechange', () => {
+    //     videoVolume.value = Math.round(videoPlayer.volume * 100);
+    // });
+
+    changeValue();
 };
