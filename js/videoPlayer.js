@@ -1,3 +1,5 @@
+import {addZero} from './supScript.js';
+
 export const videoPlayerInit = () => {
     const videoPlayer = document.querySelector('.video-player');
     const videoButtonPlay = document.querySelector('.video-button__play');
@@ -49,17 +51,11 @@ export const videoPlayerInit = () => {
     }
 
     /**
-     * Добавление нуля в счетчике времени
-     * @param {number} n - минуты
-     */
-    const addZero = n => n < 10 ? '0' + n : n;
-
-    /**
      * Функция изменения громкости проигрывания
      */
     const changeValue = () => {
         const valueVolume = videoVolume.value;
-
+        videoPlayer.muted = false;
         videoPlayer.volume = valueVolume / 100;
     }
 
@@ -104,12 +100,12 @@ export const videoPlayerInit = () => {
      * Отключение звука и возврат в обратное положение
      */  
     videoVolumeOff.addEventListener('click', () => {
-        const valueVolume = videoVolume.value;
-
-        if (videoPlayer.volume != 0) {
-            videoPlayer.volume = 0;
+        if (!videoPlayer.muted) {
+            videoPlayer.muted = true;
+            videoVolume.value = 0;
         } else {
-            videoPlayer.volume = valueVolume / 100;
+            videoPlayer.muted = false;
+            videoVolume.value = videoPlayer.volume * 100;
         }
     });
 
@@ -124,6 +120,17 @@ export const videoPlayerInit = () => {
     });
 
     /**
+     * Добавление контролов при полном экране в firefox
+     */  
+    videoPlayer.addEventListener('fullscreenchange', () => {
+        if (document.fullscreen) {
+            videoPlayer.controls = true;
+        } else {
+            videoPlayer.controls = false;
+        }
+    });
+
+    /**
      * Изменение громкости через изменение положения бегунка
      */  
     videoVolume.addEventListener('input', changeValue);
@@ -133,4 +140,9 @@ export const videoPlayerInit = () => {
     // });
 
     changeValue();
+
+    videoPlayerInit.stop = () => {
+        videoPlayer.pause();
+        toggleIcon();
+    };
 };
